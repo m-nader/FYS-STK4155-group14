@@ -1,0 +1,46 @@
+[Bruker]
+
+How to write an abstract
+
+
+[GPT]
+
+Writing an abstract involves summarizing the key components of a larger work, such as a research paper, thesis, or article. Here are some steps to help you write an effective abstract:
+
+### 1. Understand the Purpose
+An abstract is meant to provide a brief overview of your work, helping readers quickly determine the relevance and significance of your research.
+
+### 2. Identify Key Components
+An abstract typically includes the following elements:
+- **Purpose/Objective**: What is the main goal of your research?
+- **Methods/Approach**: What methods or approaches did you use to conduct your research?
+- **Results**: What were your primary findings?
+- **Conclusion/Implications**: What do your results mean, and what are the implications of your research?
+
+### 3. Write Concisely
+- Aim for clarity and brevity; an abstract is usually between 150 to 300 words.
+- Use clear and straightforward language without jargon. 
+
+### 4. Follow a Structure
+You can structure your abstract as follows:
+- **Introduction (1-2 sentences)**: Introduce the topic and state the research problem or question.
+- **Methods (2-3 sentences)**: Describe the approach or methodology used.
+- **Results (2-3 sentences)**: Highlight the main findings.
+- **Conclusion (1-2 sentences)**: Summarize the significance of the results and their implications.
+
+### 5. Use Active Voice
+Whenever possible, use the active voice to make your abstract more engaging and direct.
+
+### 6. Avoid Unnecessary Details
+Do not include tables, figures, or citations in your abstract. It should stand alone without requiring additional context.
+
+### 7. Revise and Edit
+After writing your abstract, revise it to ensure it captures the essence of your work accurately. Check for grammatical errors and clarity, and ensure it stays within any word limits required.
+
+### Example Abstract:
+Here’s a simplified example to illustrate the process:
+
+**Abstract**:
+This study investigates the effects of social media on adolescent mental health. Using a mixed-methods approach, we surveyed 500 adolescents and conducted in-depth interviews with 30 participants. Our results reveal that excessive social media use is correlated with increased levels of anxiety and depression among teenagers. These findings suggest that parents and educators should monitor and guide social media usage to support positive mental health among youth.
+
+By following these steps, you can create an informative and compelling abstract that effectively summarizes your research.
