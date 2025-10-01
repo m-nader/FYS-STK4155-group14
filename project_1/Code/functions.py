@@ -1,10 +1,8 @@
+import numpy as np
+
 def runge(x_values):
     """ Arguments: x_values, or a single x_value
     returns: the runge function of the x-values"""
-
-<<<<<<< Updated upstream
-    return 1 / (1 + 25* x_values**2)
-=======
     return 1 / (1 + 25* (x_values**2))
 
 def OLS_parameters(X, y):
@@ -38,4 +36,3 @@ def Ridge_gradient(X, y, theta, lam):
     n = y.shape[0]   
     gradient = 2.0/n * (X.T @ (X @ theta) - X.T @ y) + 2*lam*theta
     return gradient
->>>>>>> Stashed changes
