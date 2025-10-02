@@ -36,3 +36,8 @@ def Ridge_gradient(X, y, theta, lam):
     n = y.shape[0]   
     gradient = 2.0/n * (X.T @ (X @ theta) - X.T @ y) + 2*lam*theta
     return gradient
+
+def Lasso_gradient(X, y, theta, lam):
+    n = y.shape[0]
+    gradient = 2.0/n * (X.T @ (X @ theta) - X.T @ y) + lam * np.sign(theta)
+    return gradient
