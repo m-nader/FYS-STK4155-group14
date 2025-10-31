@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn.metrics import accuracy_score
 
 def runge(x_values):
     """ Arguments: x_values, or a single x_value
@@ -76,10 +77,32 @@ def softmax_vec(z):
     e_z = np.exp(z - np.max(z))
     return e_z / np.sum(e_z)
 
+def softmax_der(z, softmax=softmax):
+    s = softmax(z)
+    return s * (1 - s)
+
 
 def mse_der(predict, target):
     return 2 * (predict - target) / target.size
 
+
+
+def cross_entropy(predict, target):
+    return np.sum(-target * np.log(predict))
+
+def cross_entropy_der(predict, target):
+    return - (target / predict) / target.shape[0]
+
+def cost(input, layers, activation_funcs, target):
+    predict = feed_forward_batch(input, layers, activation_funcs)
+    return cross_entropy(predict, target)
+
+def accuracy(predictions, targets):
+    one_hot_predictions = np.zeros(predictions.shape)
+
+    for i, prediction in enumerate(predictions):
+        one_hot_predictions[i, np.argmax(prediction)] = 1
+    return accuracy_score(one_hot_predictions, targets)
 # neural network functions
 
 def create_layers(network_input_size, layer_output_sizes):
@@ -110,7 +133,7 @@ def feed_forward_saver(input, layers, activation_funcs):
     a = input
     for (W, b), activation_func in zip(layers, activation_funcs):
         layer_inputs.append(a)
-        z = W @ a + b
+        z = np.dot(a, W) + b
         a = activation_func(z)
 
         zs.append(z)
@@ -143,6 +166,31 @@ def backpropagation(
         layer_grads[i] = (dC_dW, dC_db)
 
     return layer_grads
+
+def backpropagation_cross(
+    inputs, layers, activation_funcs, targets, activation_ders
+):
+    # backpropagation with simplification for softmax + cross-entropy
+    layer_inputs, zs, predicts = feed_forward_saver(inputs, layers, activation_funcs)
+
+    layer_grads = [() for layer in layers]
+
+    # We loop over the layers, from the last to the first
+    for i in reversed(range(len(layers))):
+        layer_input, z, activation_der = layer_inputs[i], zs[i], activation_ders[i]
+        if i == len(layers) - 1:
+            dC_dz = predicts - targets  # Simplification for softmax + cross-entropy
+        else:
+            (W, b) = layers[i + 1]
+            dC_da = W @ dC_dz.T
+            dC_dz = activation_der(z) * dC_da.T 
+        dC_dW = layer_input.T @ dC_dz
+        dC_db = np.mean(dC_dz, axis=0)
+
+        layer_grads[i] = (dC_dW, dC_db)
+
+    return layer_grads
+
 
 def train_network(
     inputs, layers, activation_funcs, activation_ders, targets, cost_der, learning_rate=0.001, epochs=100, momentum=0.3, minibatch_size=15
