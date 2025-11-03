@@ -126,11 +126,10 @@ def feed_forward_batch(inputs, layers, activation_funcs):
         a = activation_func(z)
     return a
 
-
-def feed_forward_saver(input, layers, activation_funcs):
+def feed_forward_saver(inputs, layers, activation_funcs):
     layer_inputs = []
     zs = []
-    a = input
+    a = inputs
     for (W, b), activation_func in zip(layers, activation_funcs):
         layer_inputs.append(a)
         z = np.dot(a, W) + b
@@ -141,27 +140,35 @@ def feed_forward_saver(input, layers, activation_funcs):
     return layer_inputs, zs, a
 
 def backpropagation(
-    input, layers, activation_funcs, target, activation_ders, cost_der=mse_der
+    inputs, layers, activation_funcs, targets, activation_ders, cost_der=mse_der
 ):
-    layer_inputs, zs, predict = feed_forward_saver(input, layers, activation_funcs)
+    layer_inputs, zs, predicts = feed_forward_saver(inputs, layers, activation_funcs)
 
     layer_grads = [() for layer in layers]
 
     # We loop over the layers, from the last to the first
     for i in reversed(range(len(layers))):
+        print('Backpropagation - Layer:', i)
         layer_input, z, activation_der = layer_inputs[i], zs[i], activation_ders[i]
 
         if i == len(layers) - 1:
             # For last layer we use cost derivative as dC_da(L) can be computed directly
-            dC_da = cost_der(predict, target)
+            print('Last layer')
+            dC_da = cost_der(predicts, targets)
         else:
             # For other layers we build on previous z derivative, as dC_da(i) = dC_dz(i+1) * dz(i+1)_da(i)
+            print('No last layer')
             (W, b) = layers[i + 1]
-            dC_da = W @ dC_dz.T
+            print('W shape:', W.shape)
+            dC_da = W @ dC_dz
 
-        dC_dz = activation_der(z) * dC_da.T
-        dC_dW = layer_input.T @ dC_da.T
+        dC_dz = activation_der(z) * dC_da
+        dC_dW = np.outer(layer_input, dC_dz)
         dC_db = dC_dz
+        print('dC_dW shape:', dC_dW.shape)
+        print('dC_db shape:', dC_db.shape)
+        print('dC_dz shape:', dC_dz.shape)
+        print('dC_da shape:', dC_da.shape)
 
         layer_grads[i] = (dC_dW, dC_db)
 
