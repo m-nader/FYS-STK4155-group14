@@ -157,10 +157,10 @@ def backpropagation(
         else:
             # For other layers we build on previous z derivative, as dC_da(i) = dC_dz(i+1) * dz(i+1)_da(i)
             (W, b) = layers[i + 1]
-            dC_da = W.T @ dC_dz
+            dC_da = W @ dC_dz.T
 
-        dC_dz = dC_da * activation_der(z)
-        dC_dW = np.outer(dC_dz, layer_input)
+        dC_dz = activation_der(z) * dC_da.T
+        dC_dW = layer_input.T @ dC_da.T
         dC_db = dC_dz
 
         layer_grads[i] = (dC_dW, dC_db)
