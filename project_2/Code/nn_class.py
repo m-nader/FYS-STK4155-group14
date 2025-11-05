@@ -119,7 +119,7 @@ class NeuralNetwork:
             b = b - update_b
             self.layers[idx] = (W, b)
 
-    def train_network_stochastic_gd(
+    def train_network_stochastic_gd_mom(
         self, learning_rate=0.001, epochs=100, momentum=0.3, minibatch_size=1
     ):
         change = [ (np.zeros_like(W), np.zeros_like(b)) for (W, b) in self.layers ]
@@ -143,6 +143,30 @@ class NeuralNetwork:
                     self.layers[idx] = (W, b)
                     change[idx] = (new_change_W, new_change_b) 
     
+    def train_network_stochastic_gd(
+        self, learning_rate=0.001, epochs=100, minibatch_size=1
+    ):
+        change = [ (np.zeros_like(W), np.zeros_like(b)) for (W, b) in self.layers ]
+        n_data = self.x_data.shape[0]
+        m = int(n_data / minibatch_size)
+        t0, t1 = 5, 50
+        for epoch in range(epochs):
+            indices = np.random.permutation(n_data)
+            x_shuffled = self.x_data[indices]
+            y_shuffled = self.y_data[indices]
+            for i in range(m):
+                xi = x_shuffled[i : i + minibatch_size]
+                yi = y_shuffled[i : i + minibatch_size]
+                layer_grads = self.backpropagation(xi, yi)
+                for idx, ((W, b), (W_g, b_g), (W_c, b_c)) in enumerate(zip(self.layers, layer_grads, change)):
+                    new_change_W =  learning_rate  * W_g
+                    new_change_b =  learning_rate  * b_g
+                    W -= new_change_W
+                    b -= new_change_b
+                    self.layers[idx] = (W, b)
+                    change[idx] = (new_change_W, new_change_b) 
+
+
     def train_network_plain_gd(
         self, learning_rate=0.01, max_iter=100000, stopping_criteria=1e-10, lr_method=None, delta=1e-8, rho=0.9, beta1=0.9, beta2=0.999
     ):
