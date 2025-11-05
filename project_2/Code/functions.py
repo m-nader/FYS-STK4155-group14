@@ -78,7 +78,7 @@ def softmax_der(z, softmax=softmax):
 
 # Loss functions and their derivatives
 
-def MSE(y_data, y_model):   
+def MSE(y_model, y_data):   
     return np.mean((y_data - y_model) ** 2)
 
 def mse_der(predict, target):
@@ -92,7 +92,7 @@ def cross_entropy_der(predict, target):
 
 # Performance metrics
 
-def R2(y_data, y_model):
+def R2(y_model, y_data):
     return 1 - np.sum((y_data - y_model) ** 2) / np.sum((y_data - np.mean(y_model)) ** 2)
 
 def accuracy(predictions, targets):

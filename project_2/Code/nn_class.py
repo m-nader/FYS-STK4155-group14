@@ -9,9 +9,10 @@ class NeuralNetwork:
         activation_funcs,
         activation_ders,
         cost_fun,
-        cost_der,
+        cost_der_func,
         L1=False,
         L2=False,
+        lmbda=0.0,
     ):
         self.x_data = x_data
         self.y_data = y_data
@@ -20,10 +21,11 @@ class NeuralNetwork:
         self.activation_funcs = activation_funcs
         self.activation_ders = activation_ders
         self.cost_fun = cost_fun
-        self.cost_der = cost_der
+        self.cost_der_func = cost_der_func
         self.layers = self.create_layers()
         self.L1 = L1
         self.L2 = L2
+        self.lmbda = lmbda
 
     def create_layers(self):
         layers = []
@@ -46,7 +48,32 @@ class NeuralNetwork:
 
     def cost(self):
         predicts = self.predict()
-        return self.cost_fun(predicts, self.y_data)
+        cost = self.cost_fun(predicts, self.y_data)
+        if self.L1:
+            L1_sum = 0
+            for W, _ in self.layers:
+                L1_sum += np.sum(np.abs(W))
+            cost += self.lmbda * L1_sum / (2 * self.x_data.shape[0])
+        if self.L2:
+            L2_sum = 0
+            for W, _ in self.layers:
+                L2_sum += np.sum(W ** 2)
+            cost += self.lmbda * L2_sum / (2 * self.x_data.shape[0])
+        return cost
+
+    def cost_der(self, predicts, targets):
+        cost_der = self.cost_der_func(predicts, targets)
+        if self.L1:
+            L1_der_sum = 0
+            for W, _ in self.layers:
+                L1_der_sum += np.sign(W)
+            cost_der += self.lmbda * L1_der_sum / (2 * self.x_data.shape[0])
+        if self.L2:
+            L2_der_sum = 0
+            for W, _ in self.layers:
+                L2_der_sum += 2 * W
+            cost_der += self.lmbda * L2_der_sum / (2 * self.x_data.shape[0])
+        return cost_der 
     
     def _feed_forward_saver(self, inputs=None):
         layer_inputs = []
