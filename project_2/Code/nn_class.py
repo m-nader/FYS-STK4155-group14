@@ -53,7 +53,7 @@ class NeuralNetwork:
             L1_sum = 0
             for W, _ in self.layers:
                 L1_sum += np.sum(np.abs(W))
-            cost += self.lmbda * L1_sum / (2 * self.x_data.shape[0])
+            cost += self.lmbda * L1_sum / self.x_data.shape[0]
         if self.L2:
             L2_sum = 0
             for W, _ in self.layers:
@@ -63,16 +63,6 @@ class NeuralNetwork:
 
     def cost_der(self, predicts, targets):
         cost_der = self.cost_der_func(predicts, targets)
-        if self.L1:
-            L1_der_sum = 0
-            for W, _ in self.layers:
-                L1_der_sum += np.sign(W)
-            cost_der += self.lmbda * L1_der_sum / (2 * self.x_data.shape[0])
-        if self.L2:
-            L2_der_sum = 0
-            for W, _ in self.layers:
-                L2_der_sum += 2 * W
-            cost_der += self.lmbda * L2_der_sum / (2 * self.x_data.shape[0])
         return cost_der 
     
     def _feed_forward_saver(self, inputs=None):
@@ -99,6 +89,7 @@ class NeuralNetwork:
             layer_input = layer_inputs[i]
             z = zs[i]
             activation_der = self.activation_ders[i]
+            W, b = self.layers[i]
 
             if i == len(self.layers) - 1:
                 # For last layer we use cost derivative as dC_da(L) can be computed directly
@@ -112,6 +103,15 @@ class NeuralNetwork:
                 dC_dz = activation_der(z) * dC_da.T
 
             dC_dW = layer_input.T @ dC_dz
+            # add regularization to the weight gradient (use full dataset size to match cost())
+            n = self.x_data.shape[0]
+            if self.L2:
+                # cost() uses lambda * sum(W^2) / (2n) so gradient is lambda * W / n
+                dC_dW = dC_dW + (self.lmbda / n) * W
+            if self.L1:
+                # cost() used lambda * sum(|W|) / (2n) so gradient is lambda * sign(W) / (2n)
+                dC_dW = dC_dW + (self.lmbda / n) * np.sign(W)
+
             # return bias gradient as 1D array (matches stored b shape)
             dC_db = np.mean(dC_dz, axis=0)
 
@@ -219,7 +219,8 @@ class NeuralNetwork:
             prev_cost = self.cost()
             self.layers = current_layers
             curr_cost = self.cost()
-
+            if i % 1000 == 0:
+                print(f"Iteration {i}, cost: {curr_cost:.6f}")
             if abs(prev_cost - curr_cost) <= stopping_criteria:
                 print(f"Early stopping at iteration {i}, cost change {abs(prev_cost - curr_cost):.2e} <= {stopping_criteria}")
                 break
