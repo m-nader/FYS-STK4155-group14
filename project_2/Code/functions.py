@@ -85,7 +85,8 @@ def mse_der(predict, target):
     return 2 * (predict - target) / target.shape[0]
 
 def cross_entropy(predict, target):
-    return np.sum(-target * np.log(predict))
+    target_one_hot = np.eye(10)[target]
+    return np.sum(-target_one_hot * np.log(predict))
 
 def cross_entropy_der(predict, target):
     return - (target / predict) / target.shape[0]
