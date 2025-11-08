@@ -184,60 +184,6 @@ class NeuralNetwork:
             W = W - update_W
             b = b - update_b
             self.layers[idx] = (W, b)
-
-    # def train_network_stochastic_gd_mom(
-    #     self, learning_rate=0.001, epochs=100, momentum=0.3, minibatch_size=64
-    # ):
-    #     change = [
-    #         (np.zeros_like(W), np.zeros_like(b)) for (W, b) in self.layers
-    #     ]
-    #     n_data = self.x_data.shape[0]
-    #     m = int(n_data / minibatch_size)
-    #     for epoch in range(epochs):
-    #         indices = np.random.permutation(n_data)
-    #         x_shuffled = self.x_data[indices]
-    #         y_shuffled = self.y_data[indices]
-    #         for batch_idx in range(m):
-    #             start = batch_idx * minibatch_size
-    #             end = start + minibatch_size
-    #             xi = x_shuffled[start:end]
-    #             yi = y_shuffled[start:end]
-    #             layer_grads = self.backpropagation(xi, yi)
-    #             for idx, ((W, b), (W_g, b_g), (W_c, b_c)) in enumerate(
-    #                 zip(self.layers, layer_grads, change)
-    #             ):
-    #                 new_change_W = learning_rate * W_g + momentum * W_c
-    #                 new_change_b = learning_rate * b_g + momentum * b_c
-    #                 W -= new_change_W
-    #                 b -= new_change_b
-    #                 self.layers[idx] = (W, b)
-    #                 change[idx] = (new_change_W, new_change_b)
-
-    # def train_network_stochastic_gd(
-    #     self, learning_rate=0.001, epochs=100, minibatch_size=128,
-    # ):
-    #     change = [
-    #         (np.zeros_like(W), np.zeros_like(b)) for (W, b) in self.layers
-    #     ]
-    #     n_data = self.x_data.shape[0]
-    #     m = int(n_data / minibatch_size)
-    #     for epoch in range(epochs):
-    #         indices = np.random.permutation(n_data)
-    #         x_shuffled = self.x_data[indices]
-    #         y_shuffled = self.y_data[indices]
-    #         for i in range(m):
-    #             xi = x_shuffled[i * minibatch_size : i *minibatch_size + minibatch_size]
-    #             yi = y_shuffled[i * minibatch_size : i *minibatch_size + minibatch_size]
-    #             layer_grads = self.backpropagation(xi, yi)
-    #             for idx, ((W, b), (W_g, b_g), (W_c, b_c)) in enumerate(
-    #                 zip(self.layers, layer_grads, change)
-    #             ):
-    #                 new_change_W = learning_rate * W_g
-    #                 new_change_b = learning_rate * b_g
-    #                 W -= new_change_W
-    #                 b -= new_change_b
-    #                 self.layers[idx] = (W, b)
-    #                 change[idx] = (new_change_W, new_change_b)
         
 
     def train_network_stochastic_gd(
