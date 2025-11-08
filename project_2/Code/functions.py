@@ -61,10 +61,10 @@ def sigmoid_der(z):
     return sigmoid(z) * (1 - sigmoid(z))
 
 def softmax(z):
-    """Compute softmax values for each set of scores in the rows of the matrix z.
-    Used with batched input data."""
-    e_z = np.exp(z - np.max(z, axis=0))
-    return e_z / np.sum(e_z, axis=1)[:, np.newaxis]
+    z_shift = z - np.max(z, axis=1, keepdims=True)
+    exp_z = np.exp(z_shift)
+    return exp_z / np.sum(exp_z, axis=1, keepdims=True)
+
 
 def softmax_vec(z):
     """Compute softmax values for each set of scores in the vector z.
@@ -84,9 +84,15 @@ def MSE(y_model, y_data):
 def mse_der(predict, target):
     return 2 * (predict - target) / target.shape[0]
 
-def cross_entropy(predict, target):
-    target_one_hot = np.eye(10)[target]
-    return np.sum(-target_one_hot * np.log(predict))
+def cross_entropy(predict, target, eps=1e-12):
+    # clip to avoid log(0) and keep probs in (eps, 1)
+    p = np.clip(predict, eps, 1.0)
+    # pick the probability of the correct class for each sample
+    n = p.shape[0]
+    correct_class_probs = p[np.arange(n), target]
+    return -np.mean(np.log(correct_class_probs))
+
+
 
 def cross_entropy_der(predict, target):
     return - (target / predict) / target.shape[0]

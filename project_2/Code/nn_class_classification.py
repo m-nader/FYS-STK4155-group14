@@ -103,6 +103,8 @@ class NeuralNetwork:
                 # dC_da = next_W @ dC_dz.T
                 # dC_dz = activation_der(z) * dC_da.T
             dC_dW = layer_input.T @ dC_dz
+            batch_size = layer_input.shape[0]
+            dC_dW = dC_dW / batch_size
             # add regularization to the weight gradient (use full dataset size to match cost())
             n = self.x_data.shape[0]
             if self.L2:
@@ -114,6 +116,8 @@ class NeuralNetwork:
 
             # return bias gradient as 1D array (matches stored b shape)
             dC_db = np.mean(dC_dz, axis=0)
+
+
 
             layer_grads[i] = (dC_dW, dC_db)
 
@@ -182,7 +186,7 @@ class NeuralNetwork:
             self.layers[idx] = (W, b)
 
     def train_network_stochastic_gd_mom(
-        self, learning_rate=0.001, epochs=100, momentum=0.3, minibatch_size=1
+        self, learning_rate=0.001, epochs=100, momentum=0.3, minibatch_size=64
     ):
         change = [
             (np.zeros_like(W), np.zeros_like(b)) for (W, b) in self.layers
@@ -210,21 +214,20 @@ class NeuralNetwork:
                     change[idx] = (new_change_W, new_change_b)
 
     def train_network_stochastic_gd(
-        self, learning_rate=0.001, epochs=100, minibatch_size=1
+        self, learning_rate=0.001, epochs=100, minibatch_size=128
     ):
         change = [
             (np.zeros_like(W), np.zeros_like(b)) for (W, b) in self.layers
         ]
         n_data = self.x_data.shape[0]
         m = int(n_data / minibatch_size)
-        t0, t1 = 5, 50
         for epoch in range(epochs):
             indices = np.random.permutation(n_data)
             x_shuffled = self.x_data[indices]
             y_shuffled = self.y_data[indices]
             for i in range(m):
-                xi = x_shuffled[i : i + minibatch_size]
-                yi = y_shuffled[i : i + minibatch_size]
+                xi = x_shuffled[i * minibatch_size : i *minibatch_size + minibatch_size]
+                yi = y_shuffled[i * minibatch_size : i *minibatch_size + minibatch_size]
                 layer_grads = self.backpropagation(xi, yi)
                 for idx, ((W, b), (W_g, b_g), (W_c, b_c)) in enumerate(
                     zip(self.layers, layer_grads, change)
@@ -238,7 +241,7 @@ class NeuralNetwork:
 
     def train_network_plain_gd(
         self,
-        learning_rate=0.01,
+        learning_rate=0.001,
         max_iter=100000,
         stopping_criteria=1e-10,
         lr_method=None,
@@ -258,10 +261,11 @@ class NeuralNetwork:
             second_moment = [
                 (np.zeros_like(W), np.zeros_like(b)) for (W, b) in self.layers
             ]
+        last_cost = None
         for i in range(max_iter):
             i += 1
             layer_grads = self.backpropagation()
-            prev_layers = self.layers.copy()
+            # prev_layers = self.layers.copy()
             if lr_method == "RMSProp":
                 self.update_weights_RMSProp(
                     layer_grads, G_iter, learning_rate, delta, rho
@@ -281,16 +285,23 @@ class NeuralNetwork:
                 self.update_weights(layer_grads, learning_rate)
             # Compute previous and current cost and stop if improvement below threshold
             # prev_layers was the network state before the weight update
-            current_layers = self.layers
-            self.layers = prev_layers
-            prev_cost = self.cost()
-            self.layers = current_layers
-            curr_cost = self.cost()
-            if abs(prev_cost - curr_cost) <= stopping_criteria:
-                print(
-                    f"Early stopping at iteration {i}, cost change {abs(prev_cost - curr_cost):.2e} <= {stopping_criteria}"
-                )
-                break
+
+                if i % 50 == 0:  # compute cost every 50 iters
+                    curr_cost = self.cost()
+                    if last_cost is not None and abs(last_cost - curr_cost) <= stopping_criteria:
+                        print(f"Early stopping at iter {i}, delta {abs(last_cost - curr_cost):.2e}")
+                        break
+                    last_cost = curr_cost
+            # current_layers = self.layers
+            # self.layers = prev_layers
+            # prev_cost = self.cost()
+            # self.layers = current_layers
+            # curr_cost = self.cost()
+            # if abs(prev_cost - curr_cost) <= stopping_criteria:
+            #     print(
+            #         f"Early stopping at iteration {i}, cost change {abs(prev_cost - curr_cost):.2e} <= {stopping_criteria}"
+            #     )
+            #     break
 
 
 
