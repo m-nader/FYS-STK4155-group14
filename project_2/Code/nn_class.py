@@ -182,44 +182,35 @@ class NeuralNetwork:
             b = b - update_b
             self.layers[idx] = (W, b)
 
-    def train_network_stochastic_gd_mom(
-        self, learning_rate=0.001, epochs=100, momentum=0.3, minibatch_size=1
-    ):
-        change = [
-            (np.zeros_like(W), np.zeros_like(b)) for (W, b) in self.layers
-        ]
-        n_data = self.x_data.shape[0]
-        m = int(n_data / minibatch_size)
-        for epoch in range(epochs):
-            indices = np.random.permutation(n_data)
-            x_shuffled = self.x_data[indices]
-            y_shuffled = self.y_data[indices]
-            for batch_idx in range(m):
-                start = batch_idx * minibatch_size
-                end = start + minibatch_size
-                xi = x_shuffled[start:end]
-                yi = y_shuffled[start:end]
-                layer_grads = self.backpropagation(xi, yi)
-                for idx, ((W, b), (W_g, b_g), (W_c, b_c)) in enumerate(
-                    zip(self.layers, layer_grads, change)
-                ):
-                    new_change_W = learning_rate * W_g + momentum * W_c
-                    new_change_b = learning_rate * b_g + momentum * b_c
-                    W -= new_change_W
-                    b -= new_change_b
-                    self.layers[idx] = (W, b)
-                    change[idx] = (new_change_W, new_change_b)
-
     def train_network_stochastic_gd(
-        self, learning_rate=0.001, epochs=100, minibatch_size=1
+        self,
+        learning_rate=0.001,
+        epochs=10000,
+        minibatch_size=15,
+        lr_method=None,
+        delta=1e-8,
+        rho=0.9,
+        beta1=0.9,
+        beta2=0.999,
     ):
+        if lr_method == "RMSProp":
+            G_iter = [
+                (np.zeros_like(W), np.zeros_like(b)) for (W, b) in self.layers
+            ]
+        elif lr_method == "ADAM":
+            first_moment = [
+                (np.zeros_like(W), np.zeros_like(b)) for (W, b) in self.layers
+            ]
+            second_moment = [
+                (np.zeros_like(W), np.zeros_like(b)) for (W, b) in self.layers
+            ]
         change = [
             (np.zeros_like(W), np.zeros_like(b)) for (W, b) in self.layers
         ]
         n_data = self.x_data.shape[0]
         m = int(n_data / minibatch_size)
-        t0, t1 = 5, 50
         for epoch in range(epochs):
+            epoch += 1
             indices = np.random.permutation(n_data)
             x_shuffled = self.x_data[indices]
             y_shuffled = self.y_data[indices]
@@ -227,15 +218,24 @@ class NeuralNetwork:
                 xi = x_shuffled[i : i + minibatch_size]
                 yi = y_shuffled[i : i + minibatch_size]
                 layer_grads = self.backpropagation(xi, yi)
-                for idx, ((W, b), (W_g, b_g), (W_c, b_c)) in enumerate(
-                    zip(self.layers, layer_grads, change)
-                ):
-                    new_change_W = learning_rate * W_g
-                    new_change_b = learning_rate * b_g
-                    W -= new_change_W
-                    b -= new_change_b
-                    self.layers[idx] = (W, b)
-                    change[idx] = (new_change_W, new_change_b)
+                prev_layers = self.layers.copy()
+                if lr_method == "RMSProp":
+                    self.update_weights_RMSProp(
+                        layer_grads, G_iter, learning_rate, delta, rho
+                    )
+                elif lr_method == "ADAM":
+                    self.update_weights_ADAM(
+                        layer_grads,
+                        first_moment,
+                        second_moment,
+                        epoch,
+                        learning_rate,
+                        delta,
+                        beta1,
+                        beta2,
+                    )
+                else:
+                    self.update_weights(layer_grads, learning_rate)
 
     def train_network_plain_gd(
         self,
