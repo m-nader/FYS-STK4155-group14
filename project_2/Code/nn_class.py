@@ -184,9 +184,10 @@ class NeuralNetwork:
 
     def train_network_stochastic_gd(
         self,
-        learning_rate=0.001,
+        learning_rate=0.01,
         epochs=10000,
-        minibatch_size=15,
+        stopping_criteria=1e-10,
+        minibatch_size=32,
         lr_method=None,
         delta=1e-8,
         rho=0.9,
@@ -209,11 +210,13 @@ class NeuralNetwork:
         ]
         n_data = self.x_data.shape[0]
         m = int(n_data / minibatch_size)
+        iter = 0
         for epoch in range(epochs):
-            epoch += 1
+            iter += 1
             indices = np.random.permutation(n_data)
             x_shuffled = self.x_data[indices]
             y_shuffled = self.y_data[indices]
+            prev_epoch_layers = self.layers.copy()
             for i in range(m):
                 xi = x_shuffled[i : i + minibatch_size]
                 yi = y_shuffled[i : i + minibatch_size]
@@ -228,7 +231,7 @@ class NeuralNetwork:
                         layer_grads,
                         first_moment,
                         second_moment,
-                        epoch,
+                        iter,
                         learning_rate,
                         delta,
                         beta1,
@@ -236,6 +239,22 @@ class NeuralNetwork:
                     )
                 else:
                     self.update_weights(layer_grads, learning_rate)
+                # Compute previous and current cost and stop if improvement below threshold
+                # prev_layers was the network state before the weight update
+                current_layers = self.layers
+                self.layers = prev_layers
+                prev_cost = self.cost()
+                self.layers = current_layers
+                curr_cost = self.cost()
+                if abs(prev_cost - curr_cost) <= stopping_criteria:
+                    break
+            current_layers = self.layers
+            self.layers = prev_epoch_layers
+            prev_cost = self.cost()
+            self.layers = current_layers
+            curr_cost = self.cost()
+            if abs(prev_cost - curr_cost) <= stopping_criteria:
+                break
 
     def train_network_plain_gd(
         self,
