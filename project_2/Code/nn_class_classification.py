@@ -244,7 +244,7 @@ class NeuralNetwork:
     def train_network_plain_gd(
         self,
         learning_rate=0.001,
-        max_iter=100000,
+        max_iter=1000,
         stopping_criteria=1e-10,
         lr_method=None,
         delta=1e-8,
