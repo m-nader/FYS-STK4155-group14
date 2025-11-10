@@ -100,7 +100,7 @@ def cross_entropy_der(predict, target):
 # Performance metrics
 
 def R2(y_model, y_data):
-    return 1 - np.sum((y_data - y_model) ** 2) / np.sum((y_data - np.mean(y_model)) ** 2)
+    return 1 - np.sum((y_data - y_model) ** 2) / np.sum((y_data - np.mean(y_data)) ** 2)
 
 def accuracy(predictions, targets):
     one_hot_predictions = np.zeros(predictions.shape)
