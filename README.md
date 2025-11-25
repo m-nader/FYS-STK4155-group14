@@ -5,3 +5,5 @@ The notebooks for the exercises are in the 'exercise' folder.
 The codes, figures and exported LLM conversation for project 1 are in the 'project_1' folder.
 
 The codes, figures and exported LLM conversation for project 2 are in the 'project_2' folder.
+
+The codes, figures and exported LLM conversation for project 3 are in the 'project_3' folder.
