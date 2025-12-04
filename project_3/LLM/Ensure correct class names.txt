@@ -1,0 +1,140 @@
+[Bruker]
+
+This is how the data was encoded:
+```x = df.drop('Target', axis=1)
+y = df['Target']
+
+# scaler = RobustScaler()
+# x = scaler.fit_transform(x)
+encoder = OneHotEncoder(handle_unknown="ignore")
+# Assume for simplicity all features are categorical.
+encoder.fit(x) 
+x = encoder.transform(x)
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)```
+
+And this is my plotting of the tree:
+```plt.figure(figsize=(12, 8))
+tree.plot_tree(clf, filled=True, feature_names=feature_names, class_names=target_names)
+plt.title('Decision Tree Visualization')
+plt.savefig('../Figures/tree_vis.png', dpi=400)
+plt.show()```
+
+How can I ensure that the class names are correct?
+
+
+[GPT]
+
+To ensure the class names in your decision tree plot are correct, you should derive them directly from the fitted classifier rather than from the raw labels or an arbitrary list. Scikit-learn stores the learned class order in `clf.classes_`, and `plot_tree` expects `class_names` to be a list of strings in exactly this order.
+
+Here’s what to do:
+
+- Use the classifier’s `classes_` after fitting.
+- Convert them to strings (required by `plot_tree`).
+- If you have custom display names (e.g., mapping 0 → "No", 1 → "Yes"), map them in the order of `clf.classes_`.
+
+Example:
+
+```python
+# After fitting your classifier
+clf.fit(x_train, y_train)
+
+# 1) Use the learned class order directly
+target_names = [str(c) for c in clf.classes_]
+
+# 2) Plot with correct class names
+plt.figure(figsize=(12, 8))
+tree.plot_tree(
+    clf,
+    filled=True,
+    feature_names=encoder.get_feature_names_out(),  # see note below
+    class_names=target_names
+)
+plt.title('Decision Tree Visualization')
+plt.savefig('../Figures/tree_vis.png', dpi=400)
+plt.show()
+```
+
+If you want human-friendly names for numeric labels:
+
+```python
+# Example mapping
+label_map = {0: "No", 1: "Yes"}  # or any labels for your classes
+
+# Ensure mapping follows clf.classes_ order
+target_names = [label_map[c] for c in clf.classes_]
+
+tree.plot_tree(clf, filled=True, feature_names=encoder.get_feature_names_out(), class_names=target_names)
+```
+
+Notes and common pitfalls:
+- Don’t use `y.unique()` or a sorted list you build yourself; the order may not match `clf.classes_`.
+- `class_names` must be strings. If your classes are numbers, convert them (e.g., `str(c)`).
+- Since you’re using `OneHotEncoder` for features, make sure your `feature_names` come from the encoder:
+  ```python
+  # If x was originally a DataFrame df.drop('Target', axis=1)
+  feature_names = encoder.get_feature_names_out(df.drop('Target', axis=1).columns)
+  ```
+  Then pass `feature_names=feature_names` to `plot_tree`. If you call `get_feature_names_out()` without the input column names, it will still work in recent sklearn versions, but providing the original column names yields clearer names like "feature=value".
+
+By following this, the class names in the plot will correctly correspond to the model’s internal class ordering.
+
+
+[Bruker]
+
+How do I make the font size bigger in the tree?
+
+
+[GPT]
+
+You can increase the font size in a scikit-learn decision tree plot by using the `fontsize` parameter of `sklearn.tree.plot_tree`. You can also set global Matplotlib font sizes or adjust the text objects after plotting.
+
+Here are a few options:
+
+- Directly via `plot_tree`:
+```python
+from sklearn import tree
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(12, 8))
+tree.plot_tree(
+    clf,
+    filled=True,
+    feature_names=feature_names,
+    class_names=target_names,
+    fontsize=12  # increase this value
+)
+plt.title('Decision Tree Visualization', fontsize=14)
+plt.savefig('../Figures/tree_vis.png', dpi=400, bbox_inches='tight')
+plt.show()
+```
+
+- Set a global font size for the figure:
+```python
+import matplotlib as mpl
+mpl.rcParams.update({'font.size': 12})  # affects most text elements
+
+plt.figure(figsize=(12, 8))
+tree.plot_tree(clf, filled=True, feature_names=feature_names, class_names=target_names)
+plt.title('Decision Tree Visualization')
+plt.savefig('../Figures/tree_vis.png', dpi=400, bbox_inches='tight')
+plt.show()
+```
+
+- Manually adjust the returned text objects:
+```python
+plt.figure(figsize=(12, 8))
+texts = tree.plot_tree(clf, filled=True, feature_names=feature_names, class_names=target_names)
+
+for txt in texts:
+    txt.set_fontsize(12)
+
+plt.title('Decision Tree Visualization', fontsize=14)
+plt.savefig('../Figures/tree_vis.png', dpi=400, bbox_inches='tight')
+plt.show()
+```
+
+Tips:
+- `dpi` controls resolution, not font size; use `fontsize` for actual text scaling.
+- Use `bbox_inches='tight'` to avoid clipping labels when saving.
+- Increase `figsize` alongside `fontsize` to keep the tree readable.
