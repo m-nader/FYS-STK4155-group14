@@ -1,0 +1,196 @@
+[Bruker]
+
+Fix this table \begin{table}[]
+    \centering
+    \begin{tabular}{c|c}
+       \textbf{Type of action}  & \textbf{Scikit-learn functionalities}  \\ \hline
+        Preprocessing data  & OrdinalEncoder, OneHotEncoder, StandardScaler, RobustScaler, ColumnTransformer, train\_test\_split \\
+        Logistic Regression & LogisticRegression, LogisticRegressionCV \\
+        Neural Networks     & MLPClassifier \\
+        Decision Tree       & tree \\
+        Cross-validation    & cross\_val\_score \\
+        Analysis            & accuracy\_score, confusion\_matrix, label\_binarize                                
+    \end{tabular}
+    \caption{\textbf{Scikit-learn functionalities used in this project.}
+    \label{tab:scikit}
+\end{table}
+
+
+[GPT]
+
+Here is a cleaned-up, more LaTeX-robust version of your table. I made these improvements:
+- fixed caption/label placement,
+- used \texttt for function names so underscores don't need escaping,
+- improved column layout with a fixed-width second column to avoid overflow,
+- used booktabs-style rules for a cleaner look (requires the booktabs package).
+
+Paste this into your document preamble:
+\usepackage{booktabs}
+\usepackage{array}
+
+Then use the table code below:
+
+```tex
+\begin{table}[htbp]
+  \centering
+  \caption{\textbf{Scikit-learn functionalities used in this project.}}
+  \label{tab:scikit}
+  \begin{tabular}{@{} l  p{0.60\textwidth} @{}} % adjust width as needed
+    \toprule
+    \textbf{Type of action} & \textbf{Scikit-learn functionalities} \\
+    \midrule
+    Preprocessing data & \texttt{OrdinalEncoder}, \texttt{OneHotEncoder}, \texttt{StandardScaler}, \texttt{RobustScaler}, \texttt{ColumnTransformer}, \texttt{train\_test\_split} \\
+    Logistic Regression & \texttt{LogisticRegression}, \texttt{LogisticRegressionCV} \\
+    Neural Networks & \texttt{MLPClassifier} \\
+    Decision Tree & \texttt{tree} (e.g. \texttt{DecisionTreeClassifier}) \\
+    Cross-validation & \texttt{cross\_val\_score} \\
+    Analysis & \texttt{accuracy\_score}, \texttt{confusion\_matrix}, \texttt{label\_binarize} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+```
+
+Notes:
+- If you prefer the label inside the caption, you can also write `\caption{...\label{tab:scikit}}`, but the separate `\caption{...}` then `\label{...}` pattern shown above is common and reliable.
+- Adjust the `p{0.60\textwidth}` value to fit your document margins and desired wrapping behavior.
+
+
+[Bruker]
+
+Is this sentence well written? he data was split into 80\% training and 20\% testing, using the \textit{stratify} option from scikit-learn's \textit{train\_test\_split}, so that the proportion between the categories was retained.
+
+
+[GPT]
+
+The sentence is understandable but can be improved for grammar, clarity, and style. Here are a few polished alternatives and brief notes.
+
+Suggested edits (concise):
+- "The data were split into 80% training and 20% testing using scikit-learn's train_test_split with the stratify option, so the class proportions were retained."
+
+More formal option:
+- "The dataset was split into 80% training and 20% testing using scikit-learn's train_test_split (with the stratify option) to preserve the class proportions."
+
+If you want to explicitly mention "categories" rather than "class proportions":
+- "The data were split into 80% training and 20% testing using scikit-learn's train_test_split with stratification to preserve the proportions of the categories."
+
+Notes:
+- Use "The data were..." (data as plural) or "The dataset was..." (if you prefer singular).
+- Place percentages before the words "training" and "testing" for clarity.
+- Avoid italics for function names in running text; use monospace (\texttt{train\_test\_split}) in LaTeX or plain code-style formatting when appropriate.
+- "stratify" is better described as "with the stratify option" or "with stratification."
+
+
+[Bruker]
+
+The enrolled category had the lowest accuracy among the three, with only 38\$ being correctly placed in it while almost all graduate elements were correctly categorised. This is coherent with the fact that the dataset is imbalanced, and those are the classes with the lowest and highest representability within it. 
+
+
+[GPT]
+
+Here are corrected and improved versions of your paragraph, plus brief notes on the changes.
+
+Suggested revision (concise)
+- The "enrolled" category had the lowest accuracy among the three, with only 38% of instances correctly assigned to it, while almost all "graduate" instances were correctly classified. This is consistent with the dataset being imbalanced: these two classes have the lowest and highest representation, respectively.
+
+More formal option
+- The enrolled class exhibited the lowest accuracy (only 38% of instances were correctly classified), whereas nearly all instances of the graduate class were classified correctly. This outcome is consistent with the class imbalance in the dataset, since these classes correspond to the lowest and highest representation.
+
+Notes and small explanations
+- Replaced "38\$" with "38%".
+- Use either "data were" / "dataset was" choice consistently; here I used "instances" to avoid the plural/singular data issue.
+- Replaced "coherent" with "consistent" — more natural in this context.
+- Replaced "elements" with "instances" or "observations" — more standard in ML writing.
+- Put class names in quotes or monospace if you prefer code style (e.g., \texttt{enrolled}) for clarity in LaTeX.
+
+
+[Bruker]
+
+fix: \begin{table}[htbp]
+  \centering
+  \caption{\textbf{Decision tree's training and test accuracies.} Accuracies of decision trees with various max-depths.}
+  \label{tab:tree_depth}
+  \begin{tabular}{@{} l  p{0.60\textwidth} @{}} % adjust width as needed
+    \toprule
+    \textbf{Depth}  & \textbf{Test accuracy} & \textbf{Train accuracy}  \\
+    \midrule
+    1 & 0.706 & 0.705 \\
+    2 & 0.716 & 0.714 \\
+    3 & 0.733 & 0.741 \\
+    4 & 0.736 & 0.750 \\
+    5 & 0.757 & 0.775 \\
+    6 & 0.731 & 0.790 \\
+    7 & 0.732 & 0.820 \\
+    \vdots & \vdots & \vdots \\
+    22 & 0.677 & 1.0
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+
+[GPT]
+
+Fixed — the main problem was that your tabular column specification had only two columns while the rows contain three. I also tidied the caption and added the recommended packages (booktabs for nicer rules). If you want numeric alignment on the decimal point, consider loading siunitx and using the S column type; below I show a simple version using centered numeric columns.
+
+Preamble (if not already present):
+```tex
+\usepackage{booktabs}
+```
+
+Corrected table:
+```tex
+\begin{table}[htbp]
+  \centering
+  \caption{\textbf{Decision tree training and test accuracies.} Accuracies of decision trees with various maximum depths.}
+  \label{tab:tree_depth}
+  \begin{tabular}{@{} l c c @{}} % three columns: depth, test, train
+    \toprule
+    \textbf{Depth} & \textbf{Test accuracy} & \textbf{Train accuracy} \\
+    \midrule
+    1  & 0.706 & 0.705 \\
+    2  & 0.716 & 0.714 \\
+    3  & 0.733 & 0.741 \\
+    4  & 0.736 & 0.750 \\
+    5  & 0.757 & 0.775 \\
+    6  & 0.731 & 0.790 \\
+    7  & 0.732 & 0.820 \\
+    \vdots & \vdots & \vdots \\
+    22 & 0.677 & 1.000 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+```
+
+Optional improvements
+- To align numbers on the decimal point, load siunitx and use S columns:
+  ```tex
+  \usepackage{siunitx}
+  ...
+  \begin{tabular}{@{} l S[table-format=1.3] S[table-format=1.3] @{}} 
+  ```
+- If you prefer percentages, multiply by 100 and append \% (e.g. 70.6\%).
+
+
+[Bruker]
+
+All of our models struggle with categorising \texttt{enrolled} correctly, as did previous work \cite{Martins21data, Martins23data}. Both the neural network and the decision tree falsely classify these as \texttt{graduate} more often than correctly labelling them (see Figure \ref{fig:nn_conf} and Figure \ref{fig:dtree_conf}). The logistic model does not accurately label \texttt{enrolled} better than the neural network, but it misclassifies this class slightly better. For the institution it is better that a student who is at risk of spending extra years studying gets misclassified as a student who is at risk of dropping out. Both the logistic regression model and the neural network label \texttt{enrolled} incorrectly, but the logistic regression model labels more of them as \texttt{dropout} than the neural network does.
+
+
+[GPT]
+
+Here are three polished rewrites at different levels of formality and detail, plus a short note on clarity and suggested metrics to back the claims. Pick the one that best fits your paper.
+
+1) Concise, formal (suitable for Results)
+All models struggle to classify the enrolled class correctly, consistent with previous work \cite{Martins21data,Martins23data}. Both the neural network and the decision tree more often confuse enrolled students with graduate (Figures \ref{fig:nn_conf} and \ref{fig:dtree_conf}). The logistic model does not outperform the neural network overall on this class, but it tends to misclassify enrolled students slightly differently: logistic regression assigns a larger fraction of enrolled cases to dropout, whereas the neural network assigns more to graduate. From an institutional perspective, mislabeling an enrolled student as dropout is preferable to mislabeling them as graduate, since the former better highlights the risk of extended study.
+
+2) Slightly expanded (adds interpretation)
+Consistent with \cite{Martins21data,Martins23data}, all classifiers have difficulty with the enrolled category. The confusion matrices in Figures \ref{fig:nn_conf} and \ref{fig:dtree_conf} show that the neural network and decision tree more frequently predict graduate for true enrolled cases. The logistic model’s errors on enrolled are not fewer in number, but their pattern differs: logistic regression classifies more enrolled students as dropout, while the neural network more often labels them as graduate. Given institutional priorities, flagging potentially prolonged study (dropout risk) may be preferable to incorrectly marking students as graduates.
+
+3) Short, slide-friendly
+All models struggle with enrolled (cf. \cite{Martins21data,Martins23data}). NN and tree typically predict graduate for enrolled; logistic regression more often predicts dropout. For the institution, the latter error mode is less harmful.
+
+Notes and suggestions for clarity
+- Quantify the statements: give per-class recall/precision or the relevant off-diagonal counts from the confusion matrices (e.g., “X% of enrolled were predicted as graduate by the NN, Y% by the tree, and Z% as dropout by logistic regression”). This makes the comparison precise and harder to misinterpret.
+- If you mean “better” or “preferable” for the institution, state the reason (e.g., “because it triggers support interventions”) to avoid ambiguity.
+- Make sure figure references match the text (e.g., refer to the specific panels or subplots if needed).
+
+If you’d like, I can produce a suggested sentence that includes example numbers (you can plug in your values), or rewrite the paragraph to fit a Discussion section with implications and recommended actions.
