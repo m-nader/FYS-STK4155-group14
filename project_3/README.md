@@ -14,9 +14,10 @@ Contains the original data set and the processed data set.
 
 ## Code folder
     - adjust_data.ipynb - exploration and curation of the data set used. 
-    - decision_tree_adjusted_data.ipynb - decision tree and figures
-    - logistic_regression.ipynb - logistic regression
-    - nn.ipynb - neural network and figures
+    - decision_tree.ipynb - exploration of decision trees.
+    - decision_tree_adjusted_data.ipynb - decision tree and figures.
+    - logistic_regression.ipynb - logistic regression.
+    - nn.ipynb - neural network and figures.
 
 ## Figures folder
 Contains the figures from the project used in the report.
